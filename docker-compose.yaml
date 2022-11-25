@@ -1,0 +1,26 @@
+version: "2"
+
+services: # all are containers 
+  php-server: # service-1 
+    build:
+      context: . # will take all current files 
+      dockerfile: php/Dockerfile # path to php dockerfile 
+    expose:
+      - "9000" # expose port 
+    container_name: php_server # set name for container 
+    extra_hosts: # 
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./src:/var/www/html  # all files in var container will be set in local src to persist the data 
+    environment:
+        APP_ENV: dev
+  
+  nginx-server: # service-2 
+    build: nginx
+    ports:
+      - "8080:80" # 8080 this local - 80 this container port 
+    container_name: nginx_server
+    volumes:
+      - ./src:/var/www/html
+    depends_on: # depends 
+      - php-server
